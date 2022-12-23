@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace KafkaDemoUI
 {
     public partial class Form1 : Form
@@ -21,24 +23,55 @@ namespace KafkaDemoUI
             }
             catch (Exception ex)
             {
-
-                throw;
+                MessageBox.Show(ex.StackTrace, ex.Message, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             
         }
 
         private void btnSubmitMessage_Click(object sender, EventArgs e)
         {
-            if(string.IsNullOrEmpty(txtMessage.Text))
+            try
             {
-                MessageBox.Show("No message to process", "Empty Message", MessageBoxButtons.OK, MessageBoxIcon.Warning);    
-                return; 
-            }
-        }
+                if (string.IsNullOrEmpty(txtMessage.Text))
+                {
+                    MessageBox.Show("No message to process", "Empty Message", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
 
-        private void cboTopics_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            bool doesTopicExist = _kafkaEngine.ValidateTopic(this.cboTopics.SelectedItem.ToString());
+                string topicName = this.cboTopics.Text;
+                var error = _kafkaEngine.ValidateTopic(topicName);
+
+                if (error.Code == Confluent.Kafka.ErrorCode.NoError)
+                {
+                    var frmConsumer = new FormConsumer() { TopicName = topicName };
+                    frmConsumer.Show();
+                }
+                else if (error.Code == Confluent.Kafka.ErrorCode.UnknownTopicOrPart)
+                {
+                    if (!cbxCreateTopic.Checked)
+                    {
+                        MessageBox.Show("Topic does not exist!  If you wish to creat this topic, check the checkbox and resubmit.", "Invalid Topic", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    }
+                    else
+                    {
+                        _kafkaEngine.CreateTopic(topicName);
+                        var frmConsumer = new FormConsumer() { TopicName = topicName };
+                        frmConsumer.ShowDialog();
+
+                        _kafkaEngine.ProduceMessage(this.txtMessage.Text, topicName);
+                    }
+                }
+                else
+                {
+
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+
         }
     }
 }

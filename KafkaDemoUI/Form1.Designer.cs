@@ -30,9 +30,7 @@
         {
             this.lblTopic = new System.Windows.Forms.Label();
             this.cboTopics = new System.Windows.Forms.ComboBox();
-            this.lbConsumer = new System.Windows.Forms.ListBox();
             this.txtMessage = new System.Windows.Forms.TextBox();
-            this.lblConsumer = new System.Windows.Forms.Label();
             this.lblMessage = new System.Windows.Forms.Label();
             this.btnSubmitMessage = new System.Windows.Forms.Button();
             this.cbxCreateTopic = new System.Windows.Forms.CheckBox();
@@ -55,33 +53,14 @@
             this.cboTopics.Name = "cboTopics";
             this.cboTopics.Size = new System.Drawing.Size(121, 23);
             this.cboTopics.TabIndex = 3;
-            this.cboTopics.SelectedIndexChanged += new System.EventHandler(this.cboTopics_SelectedIndexChanged);
-            // 
-            // lbConsumer
-            // 
-            this.lbConsumer.FormattingEnabled = true;
-            this.lbConsumer.ItemHeight = 15;
-            this.lbConsumer.Location = new System.Drawing.Point(267, 130);
-            this.lbConsumer.Name = "lbConsumer";
-            this.lbConsumer.Size = new System.Drawing.Size(179, 214);
-            this.lbConsumer.TabIndex = 4;
             // 
             // txtMessage
             // 
             this.txtMessage.Location = new System.Drawing.Point(12, 130);
             this.txtMessage.Multiline = true;
             this.txtMessage.Name = "txtMessage";
-            this.txtMessage.Size = new System.Drawing.Size(208, 214);
+            this.txtMessage.Size = new System.Drawing.Size(302, 214);
             this.txtMessage.TabIndex = 5;
-            // 
-            // lblConsumer
-            // 
-            this.lblConsumer.AutoSize = true;
-            this.lblConsumer.Location = new System.Drawing.Point(267, 112);
-            this.lblConsumer.Name = "lblConsumer";
-            this.lblConsumer.Size = new System.Drawing.Size(62, 15);
-            this.lblConsumer.TabIndex = 6;
-            this.lblConsumer.Text = "Consumer";
             // 
             // lblMessage
             // 
@@ -94,7 +73,7 @@
             // 
             // btnSubmitMessage
             // 
-            this.btnSubmitMessage.Location = new System.Drawing.Point(145, 350);
+            this.btnSubmitMessage.Location = new System.Drawing.Point(239, 350);
             this.btnSubmitMessage.Name = "btnSubmitMessage";
             this.btnSubmitMessage.Size = new System.Drawing.Size(75, 23);
             this.btnSubmitMessage.TabIndex = 8;
@@ -125,14 +104,12 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(471, 380);
+            this.ClientSize = new System.Drawing.Size(326, 380);
             this.Controls.Add(this.btnDeleteTopic);
             this.Controls.Add(this.cbxCreateTopic);
             this.Controls.Add(this.btnSubmitMessage);
             this.Controls.Add(this.lblMessage);
-            this.Controls.Add(this.lblConsumer);
             this.Controls.Add(this.txtMessage);
-            this.Controls.Add(this.lbConsumer);
             this.Controls.Add(this.cboTopics);
             this.Controls.Add(this.lblTopic);
             this.Name = "Form1";
@@ -145,9 +122,7 @@
         #endregion
         private Label lblTopic;
         private ComboBox cboTopics;
-        private ListBox lbConsumer;
         private TextBox txtMessage;
-        private Label lblConsumer;
         private Label lblMessage;
         private Button btnSubmitMessage;
         private CheckBox cbxCreateTopic;

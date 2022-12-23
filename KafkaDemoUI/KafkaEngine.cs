@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Confluent.Kafka;
@@ -16,40 +17,41 @@ namespace KafkaDemoUI
         private string _properties { get; set; }
         private IConfiguration _configuration;
         private AdminClientConfig _adminClientConfig;
+        private IAdminClient _adminClient;
+        private KafkaAdmin _kafkaAdmin;
+        private KafkaConsumer _kafkaConsumer = new KafkaConsumer();
+        private KafkaProducer _kafkaProducer = new KafkaProducer();
 
         public List<string> Topics { get; set; } = new List<string>();
+        
 
         public KafkaEngine(string properties) 
-        { 
-            _properties= properties;
-            _configuration = new ConfigurationBuilder()
-                .AddIniFile(_properties)
-                .Build();
+        {
+            _kafkaAdmin = new KafkaAdmin(properties);
 
-            _adminClientConfig = new AdminClientConfig()
-            {
-                BootstrapServers = $"{_configuration["bootstrap.servers"]}",
-                SaslPassword = _configuration[ "sasl.password" ],
-                SaslUsername = _configuration["sasl.username"],
-                SecurityProtocol = SecurityProtocol.SaslSsl,
-                SaslMechanism = SaslMechanism.Plain,
-                Debug = "all"
-            };
+            //_properties= properties;
+            //_configuration = new ConfigurationBuilder()
+            //    .AddIniFile(_properties)
+            //    .Build();
 
-            using (var adminClient = new AdminClientBuilder(_adminClientConfig)
-                .SetLogHandler((_, m) => Console.WriteLine($"[{DateTime.Now}] [{m.Level}] {m.Message}"))
-                .Build())
-            {
-                var metadata = adminClient.GetMetadata(TimeSpan.FromSeconds(10));
-                var topicsMetadata = metadata.Topics;
-                var topicNames = metadata.Topics.Select(a => a.Topic).ToList();
+            //_adminClientConfig = new AdminClientConfig()
+            //{
+            //    BootstrapServers = $"{_configuration["bootstrap.servers"]}",
+            //    SaslPassword = _configuration[ "sasl.password" ],
+            //    SaslUsername = _configuration["sasl.username"],
+            //    SecurityProtocol = SecurityProtocol.SaslSsl,
+            //    SaslMechanism = SaslMechanism.Plain,
+            //    Debug = "all"
+            //};
 
-                foreach (var item in topicNames)
-                {
-                    Topics.Add(item);
-                }
+            //_adminClient = new AdminClientBuilder(_adminClientConfig).Build();
 
-            }
+            //var metadata = _adminClient.GetMetadata(TimeSpan.FromSeconds(10));
+            //var topicsMetadata = metadata.Topics;
+            //var topicNames = metadata.Topics.Select(a => a.Topic).ToList();
+
+            //foreach (var item in topicNames)
+            //    Topics.Add(item);
 
         }
 
@@ -64,12 +66,6 @@ namespace KafkaDemoUI
                 producer.Produce(topic, new Message<string, string> { Key = key, Value = message },
                    (deliveryReport) =>
                    {
-                       if (deliveryReport.Error.Code != ErrorCode.NoError)
-                       {
-
-                           Console.WriteLine($"Failed to deliver message: {deliveryReport.Error.Reason}");
-                       }
-
                        retObj = new object[]
                        {
                                 key,
@@ -82,11 +78,22 @@ namespace KafkaDemoUI
             return retObj;
         }
 
-        public bool ValidateTopic(string topic)
+        public Error ValidateTopic(string topic) => _adminClient.GetMetadata(topic, TimeSpan.FromSeconds(10)).Topics[0].Error;
+
+
+        internal void CreateTopic(string topicName, short replicationFactor = 2, int partitions = 1)
         {
+             _adminClient.CreateTopicsAsync(
+                new TopicSpecification[]
+                    { new TopicSpecification
+                        {
+                            Name = topicName,
+                            ReplicationFactor = replicationFactor,
+                            NumPartitions= partitions
 
-            return true;
+                        }
+                    }
+            ).Wait();
         }
-
     }
 }
